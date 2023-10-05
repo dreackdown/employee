@@ -1,4 +1,4 @@
-package dev.hugofaria.erudioapi.exception;
+package dev.hugofaria.employeeapi.exception;
 
 import java.io.Serializable;
 import java.util.Date;

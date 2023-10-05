@@ -1,4 +1,4 @@
-package dev.hugofaria.erudioapi;
+package dev.hugofaria.employeeapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

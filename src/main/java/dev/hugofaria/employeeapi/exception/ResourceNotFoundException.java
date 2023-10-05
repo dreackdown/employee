@@ -1,4 +1,4 @@
-package dev.hugofaria.erudioapi.exception;
+package dev.hugofaria.employeeapi.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

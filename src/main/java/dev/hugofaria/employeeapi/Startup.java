@@ -1,4 +1,4 @@
-package dev.hugofaria.erudioapi;
+package dev.hugofaria.employeeapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
