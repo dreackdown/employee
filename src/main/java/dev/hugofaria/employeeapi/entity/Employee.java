@@ -1,12 +1,20 @@
 package dev.hugofaria.employeeapi.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "employee")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Employee implements Serializable {
 
     @Serial
@@ -26,38 +34,4 @@ public class Employee implements Serializable {
     @Column(name = "role", nullable = false)
     private String role;
 
-    public Employee() {
-    }
-
-    public Long getEmployeeId() {
-        return employeeId;
-    }
-
-    public void setEmployeeId(Long employeeId) {
-        this.employeeId = employeeId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
 }
