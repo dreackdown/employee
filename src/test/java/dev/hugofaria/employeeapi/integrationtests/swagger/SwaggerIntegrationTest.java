@@ -1,6 +1,6 @@
 package dev.hugofaria.employeeapi.integrationtests.swagger;
 
-import dev.hugofaria.employeeapi.config.TestConfig;
+import dev.hugofaria.employeeapi.config.TestConfigs;
 import dev.hugofaria.employeeapi.integrationtests.testcontainers.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +16,7 @@ public class SwaggerIntegrationTest extends AbstractIntegrationTest {
         var content =
                 given()
                         .basePath("/swagger-ui/index.html")
-                        .port(TestConfig.SERVER_PORT)
+                        .port(TestConfigs.SERVER_PORT)
                         .when()
                         .get()
                         .then()

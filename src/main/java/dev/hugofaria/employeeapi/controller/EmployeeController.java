@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+//@CrossOrigin
 @RestController
 @RequestMapping("api/employee/v1")
 @Tag(name = "Employees", description = "Endpoints for Managing Employees")
@@ -51,6 +52,7 @@ public class EmployeeController {
         return service.findAllEmployees();
     }
 
+    @CrossOrigin(origins = "http://localhost:8080")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Finds a Employee", description = "Finds a Employee",
             tags = {"Employees"},
@@ -69,6 +71,7 @@ public class EmployeeController {
         return service.findEmployeeById(id);
     }
 
+    @CrossOrigin(origins = {"http://localhost:8080", "https://erudio.com.br"})
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Adds a new Employee",
             description = "Adds a new Employee by passing in a JSON representation of the employee!",
@@ -100,8 +103,8 @@ public class EmployeeController {
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content),
             }
     )
-    public EmployeeDTO updateEmployee(@RequestBody EmployeeDTO person) {
-        return service.updateEmployee(person);
+    public EmployeeDTO updateEmployee(@RequestBody EmployeeDTO employee) {
+        return service.updateEmployee(employee);
     }
 
     @DeleteMapping(value = "/{id}")
