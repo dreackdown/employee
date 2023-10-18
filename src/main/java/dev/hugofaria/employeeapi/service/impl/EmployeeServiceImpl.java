@@ -1,5 +1,7 @@
 package dev.hugofaria.employeeapi.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.hugofaria.employeeapi.controller.EmployeeController;
 import dev.hugofaria.employeeapi.dto.EmployeeDTO;
 import dev.hugofaria.employeeapi.entity.Employee;
@@ -11,6 +13,8 @@ import dev.hugofaria.employeeapi.service.EmployeeService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
@@ -33,8 +37,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<EmployeeDTO> populateEmployees() {
         logger.info("populate employee with external service...");
 
+        ObjectMapper objectMapper = new ObjectMapper();
         String url = "https://randomuser.me/api/?results=10&inc=name";
-
         WebClient webClient = WebClient.create();
 
         String employeeJson = webClient.get()
@@ -43,9 +47,27 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .bodyToMono(String.class)
                 .block();
 
-        System.out.println(employeeJson);
+        try {
+            JsonNode jsonNode = objectMapper.readTree(employeeJson);
+            JsonNode resultsNode = jsonNode.get("results");
 
-        return Collections.emptyList();
+            List<EmployeeDTO> employees = new ArrayList<>();
+
+            for (JsonNode result : resultsNode) {
+                JsonNode nameNode = result.get("name");
+                String firstName = nameNode.get("first").asText();
+                String lastName = nameNode.get("last").asText();
+
+                EmployeeDTO employeeDTO = new EmployeeDTO(firstName, lastName);
+                employees.add(employeeDTO);
+            }
+
+            return employees;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
     }
 
     public List<EmployeeDTO> findAllEmployees() {

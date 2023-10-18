@@ -1,12 +1,17 @@
 package dev.hugofaria.employeeapi.dto;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-@Data
+@NoArgsConstructor
+@Setter
+@Getter
 public class EmployeeDTO extends RepresentationModel<EmployeeDTO> implements Serializable {
 
     @Serial
@@ -17,4 +22,8 @@ public class EmployeeDTO extends RepresentationModel<EmployeeDTO> implements Ser
     private String lastName;
     private String role;
 
+    public EmployeeDTO(@JsonProperty("first") String firstName, @JsonProperty("last") String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 }
