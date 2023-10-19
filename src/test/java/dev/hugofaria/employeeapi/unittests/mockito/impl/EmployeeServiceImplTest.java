@@ -1,6 +1,6 @@
 package dev.hugofaria.employeeapi.unittests.mockito.impl;
 
-import dev.hugofaria.employeeapi.dto.EmployeeDTO;
+import dev.hugofaria.employeeapi.dto.v1.EmployeeDto;
 import dev.hugofaria.employeeapi.entity.Employee;
 import dev.hugofaria.employeeapi.exception.RequiredObjectIsNullException;
 import dev.hugofaria.employeeapi.repository.EmployeeRepository;
@@ -140,7 +140,7 @@ class EmployeeServiceImplTest {
         Employee persisted = entity;
         persisted.setEmployeeId(1L);
 
-        EmployeeDTO dto = input.mockDto(1);
+        EmployeeDto dto = input.mockDto(1);
         dto.setEmployeeId(1L);
 
 

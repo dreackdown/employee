@@ -1,6 +1,6 @@
 package dev.hugofaria.employeeapi.unittests.mapper;
 
-import dev.hugofaria.employeeapi.dto.EmployeeDTO;
+import dev.hugofaria.employeeapi.dto.v1.EmployeeDto;
 import dev.hugofaria.employeeapi.entity.Employee;
 import dev.hugofaria.employeeapi.mapper.DozerMapper;
 import dev.hugofaria.employeeapi.unittests.mapper.mocks.MockEmployee;
@@ -22,7 +22,7 @@ public class DozerConverterTest {
 
     @Test
     public void parseEntityToDTOTest() {
-        EmployeeDTO output = DozerMapper.parseObject(inputObject.mockEntity(), EmployeeDTO.class);
+        EmployeeDto output = DozerMapper.parseObject(inputObject.mockEntity(), EmployeeDto.class);
         assertEquals(Long.valueOf(0L), output.getEmployeeId());
         assertEquals("First Name Test0", output.getFirstName());
         assertEquals("Last Name Test0", output.getLastName());
@@ -31,22 +31,22 @@ public class DozerConverterTest {
 
     @Test
     public void parseEntityListToDTOListTest() {
-        List<EmployeeDTO> outputList = DozerMapper.parseListObjects(inputObject.mockEntityList(), EmployeeDTO.class);
-        EmployeeDTO outputZero = outputList.get(0);
+        List<EmployeeDto> outputList = DozerMapper.parseListObjects(inputObject.mockEntityList(), EmployeeDto.class);
+        EmployeeDto outputZero = outputList.get(0);
 
         assertEquals(Long.valueOf(0L), outputZero.getEmployeeId());
         assertEquals("First Name Test0", outputZero.getFirstName());
         assertEquals("Last Name Test0", outputZero.getLastName());
         assertEquals("Role Test0", outputZero.getRole());
 
-        EmployeeDTO outputSeven = outputList.get(7);
+        EmployeeDto outputSeven = outputList.get(7);
 
         assertEquals(Long.valueOf(7L), outputSeven.getEmployeeId());
         assertEquals("First Name Test7", outputSeven.getFirstName());
         assertEquals("Last Name Test7", outputSeven.getLastName());
         assertEquals("Role Test7", outputSeven.getRole());
 
-        EmployeeDTO outputTwelve = outputList.get(12);
+        EmployeeDto outputTwelve = outputList.get(12);
 
         assertEquals(Long.valueOf(12L), outputTwelve.getEmployeeId());
         assertEquals("First Name Test12", outputTwelve.getFirstName());

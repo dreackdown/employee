@@ -1,4 +1,4 @@
-package dev.hugofaria.employeeapi.dto;
+package dev.hugofaria.employeeapi.dto.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Setter
 @Getter
-public class EmployeeDTO extends RepresentationModel<EmployeeDTO> implements Serializable {
+public class EmployeeDto extends RepresentationModel<EmployeeDto> implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -22,7 +22,7 @@ public class EmployeeDTO extends RepresentationModel<EmployeeDTO> implements Ser
     private String lastName;
     private String role;
 
-    public EmployeeDTO(@JsonProperty("first") String firstName, @JsonProperty("last") String lastName) {
+    public EmployeeDto(@JsonProperty("first") String firstName, @JsonProperty("last") String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
     }

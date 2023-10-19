@@ -1,6 +1,6 @@
 package dev.hugofaria.employeeapi.unittests.mapper.mocks;
 
-import dev.hugofaria.employeeapi.dto.EmployeeDTO;
+import dev.hugofaria.employeeapi.dto.v1.EmployeeDto;
 import dev.hugofaria.employeeapi.entity.Employee;
 
 import java.util.ArrayList;
@@ -12,20 +12,20 @@ public class MockEmployee {
         return mockEntity(0);
     }
 
-    public EmployeeDTO mockDto() {
+    public EmployeeDto mockDto() {
         return mockDto(0);
     }
 
     public List<Employee> mockEntityList() {
-        List<Employee> employees = new ArrayList<Employee>();
+        List<Employee> employees = new ArrayList<>();
         for (int i = 0; i < 14; i++) {
             employees.add(mockEntity(i));
         }
         return employees;
     }
 
-    public List<EmployeeDTO> mockDTOList() {
-        List<EmployeeDTO> employees = new ArrayList<>();
+    public List<EmployeeDto> mockDTOList() {
+        List<EmployeeDto> employees = new ArrayList<>();
         for (int i = 0; i < 14; i++) {
             employees.add(mockDto(i));
         }
@@ -41,8 +41,8 @@ public class MockEmployee {
         return employee;
     }
 
-    public EmployeeDTO mockDto(Integer number) {
-        EmployeeDTO employee = new EmployeeDTO();
+    public EmployeeDto mockDto(Integer number) {
+        EmployeeDto employee = new EmployeeDto();
         employee.setEmployeeId(number.longValue());
         employee.setFirstName("First Name Test" + number);
         employee.setLastName("Last Name Test" + number);

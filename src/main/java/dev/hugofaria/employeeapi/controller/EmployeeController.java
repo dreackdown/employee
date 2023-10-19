@@ -1,6 +1,6 @@
 package dev.hugofaria.employeeapi.controller;
 
-import dev.hugofaria.employeeapi.dto.EmployeeDTO;
+import dev.hugofaria.employeeapi.dto.v1.EmployeeDto;
 import dev.hugofaria.employeeapi.service.impl.EmployeeServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -27,7 +27,7 @@ public class EmployeeController {
     }
 
     @GetMapping(value = "/populate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<EmployeeDTO> populateEmployees() {
+    public List<EmployeeDto> populateEmployees() {
         return service.populateEmployees();
     }
 
@@ -39,7 +39,7 @@ public class EmployeeController {
                             content = {
                                     @Content(
                                             mediaType = "application/json",
-                                            array = @ArraySchema(schema = @Schema(implementation = EmployeeDTO.class))
+                                            array = @ArraySchema(schema = @Schema(implementation = EmployeeDto.class))
                                     )
                             }),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
@@ -48,7 +48,7 @@ public class EmployeeController {
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content),
             }
     )
-    public List<EmployeeDTO> findAllEmployees() {
+    public List<EmployeeDto> findAllEmployees() {
         return service.findAllEmployees();
     }
 
@@ -58,7 +58,7 @@ public class EmployeeController {
             tags = {"Employees"},
             responses = {
                     @ApiResponse(description = "Success", responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = EmployeeDTO.class))
+                            content = @Content(schema = @Schema(implementation = EmployeeDto.class))
                     ),
                     @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
@@ -67,7 +67,7 @@ public class EmployeeController {
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content),
             }
     )
-    public EmployeeDTO findEmployeeById(@PathVariable(value = "id") Long id) {
+    public EmployeeDto findEmployeeById(@PathVariable(value = "id") Long id) {
         return service.findEmployeeById(id);
     }
 
@@ -78,14 +78,14 @@ public class EmployeeController {
             tags = {"Employees"},
             responses = {
                     @ApiResponse(description = "Success", responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = EmployeeDTO.class))
+                            content = @Content(schema = @Schema(implementation = EmployeeDto.class))
                     ),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content),
             }
     )
-    public EmployeeDTO createEmployee(@RequestBody EmployeeDTO dto) {
+    public EmployeeDto createEmployee(@RequestBody EmployeeDto dto) {
         return service.createEmployee(dto);
     }
 
@@ -95,7 +95,7 @@ public class EmployeeController {
             tags = {"Employees"},
             responses = {
                     @ApiResponse(description = "Updated", responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = EmployeeDTO.class))
+                            content = @Content(schema = @Schema(implementation = EmployeeDto.class))
                     ),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
@@ -103,7 +103,7 @@ public class EmployeeController {
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content),
             }
     )
-    public EmployeeDTO updateEmployee(@RequestBody EmployeeDTO employee) {
+    public EmployeeDto updateEmployee(@RequestBody EmployeeDto employee) {
         return service.updateEmployee(employee);
     }
 

@@ -3,7 +3,7 @@ package dev.hugofaria.employeeapi.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.hugofaria.employeeapi.controller.EmployeeController;
-import dev.hugofaria.employeeapi.dto.EmployeeDTO;
+import dev.hugofaria.employeeapi.dto.v1.EmployeeDto;
 import dev.hugofaria.employeeapi.entity.Employee;
 import dev.hugofaria.employeeapi.exception.RequiredObjectIsNullException;
 import dev.hugofaria.employeeapi.exception.ResourceNotFoundException;
@@ -34,7 +34,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeDTO> populateEmployees() {
+    public List<EmployeeDto> populateEmployees() {
         logger.info("populate employee with external service...");
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -51,14 +51,14 @@ public class EmployeeServiceImpl implements EmployeeService {
             JsonNode jsonNode = objectMapper.readTree(employeeJson);
             JsonNode resultsNode = jsonNode.get("results");
 
-            List<EmployeeDTO> employees = new ArrayList<>();
+            List<EmployeeDto> employees = new ArrayList<>();
 
             for (JsonNode result : resultsNode) {
                 JsonNode nameNode = result.get("name");
                 String firstName = nameNode.get("first").asText();
                 String lastName = nameNode.get("last").asText();
 
-                EmployeeDTO employeeDTO = new EmployeeDTO(firstName, lastName);
+                EmployeeDto employeeDTO = new EmployeeDto(firstName, lastName);
                 employees.add(employeeDTO);
             }
 
@@ -70,35 +70,35 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
-    public List<EmployeeDTO> findAllEmployees() {
+    public List<EmployeeDto> findAllEmployees() {
         logger.info("finding all employee...");
 
-        var employees = DozerMapper.parseListObjects(employeeRepository.findAll(), EmployeeDTO.class);
+        var employees = DozerMapper.parseListObjects(employeeRepository.findAll(), EmployeeDto.class);
         employees.forEach(p -> p.add(linkTo(methodOn(EmployeeController.class).findEmployeeById(p.getEmployeeId())).withSelfRel()));
         return employees;
     }
 
-    public EmployeeDTO findEmployeeById(Long id) {
+    public EmployeeDto findEmployeeById(Long id) {
         logger.info("finding one employee...!");
 
         var entity = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
-        var dto = DozerMapper.parseObject(entity, EmployeeDTO.class);
+        var dto = DozerMapper.parseObject(entity, EmployeeDto.class);
         dto.add(linkTo(methodOn(EmployeeController.class).findEmployeeById(id)).withSelfRel());
         return dto;
     }
 
-    public EmployeeDTO createEmployee(EmployeeDTO employee) {
+    public EmployeeDto createEmployee(EmployeeDto employee) {
         if (employee == null) throw new RequiredObjectIsNullException();
         logger.info("creating employee...");
 
         var entity = DozerMapper.parseObject(employee, Employee.class);
-        var dto = DozerMapper.parseObject(employeeRepository.save(entity), EmployeeDTO.class);
+        var dto = DozerMapper.parseObject(employeeRepository.save(entity), EmployeeDto.class);
         dto.add(linkTo(methodOn(EmployeeController.class).findEmployeeById(dto.getEmployeeId())).withSelfRel());
         return dto;
     }
 
-    public EmployeeDTO updateEmployee(EmployeeDTO employee) {
+    public EmployeeDto updateEmployee(EmployeeDto employee) {
         if (employee == null) throw new RequiredObjectIsNullException();
         logger.info("updating employee...");
 
@@ -109,7 +109,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         entity.setLastName(employee.getLastName());
         entity.setRole(employee.getRole());
 
-        var updatedEmployee = DozerMapper.parseObject(employeeRepository.save(entity), EmployeeDTO.class);
+        var updatedEmployee = DozerMapper.parseObject(employeeRepository.save(entity), EmployeeDto.class);
         updatedEmployee.add(linkTo(methodOn(EmployeeController.class).findEmployeeById(updatedEmployee.getEmployeeId())).withSelfRel());
         return updatedEmployee;
     }
