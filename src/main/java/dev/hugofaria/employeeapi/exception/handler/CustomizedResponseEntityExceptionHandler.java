@@ -1,6 +1,7 @@
 package dev.hugofaria.employeeapi.exception.handler;
 
 import dev.hugofaria.employeeapi.exception.ExceptionResponse;
+import dev.hugofaria.employeeapi.exception.InvalidJwtAuthenticationException;
 import dev.hugofaria.employeeapi.exception.RequiredObjectIsNullException;
 import dev.hugofaria.employeeapi.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -51,5 +52,17 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
                 request.getDescription(false));
 
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidJwtAuthenticationException.class)
+    public final ResponseEntity<ExceptionResponse> handleInvalidJwtAuthenticationExceptions(
+            Exception ex, WebRequest request) {
+
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
     }
 }
