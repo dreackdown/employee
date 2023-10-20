@@ -9,9 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>dev.hugofaria</groupId>
-    <artifactId>employeeapi</artifactId>
+    <artifactId>employee</artifactId>
     <version>0.0.1</version>
-    <name>erudio</name>
+    <name>employee</name>
+    <description>employee service</description>
     <properties>
         <java.version>17</java.version>
         <dozer.version>6.4.0</dozer.version>
