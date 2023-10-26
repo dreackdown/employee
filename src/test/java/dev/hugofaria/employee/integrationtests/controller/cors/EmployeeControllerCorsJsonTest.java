@@ -1,10 +1,12 @@
-package dev.hugofaria.employee.integrationtests.controller.withjson;
+package dev.hugofaria.employee.integrationtests.controller.cors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.hugofaria.employee.config.TestConfigs;
+import dev.hugofaria.employee.dto.v1.security.AccountCredentialsDto;
 import dev.hugofaria.employee.integrationtests.dto.EmployeeDTO;
+import dev.hugofaria.employee.integrationtests.dto.TokenDto;
 import dev.hugofaria.employee.integrationtests.testcontainers.AbstractIntegrationTest;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -23,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(OrderAnnotation.class)
-public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
+public class EmployeeControllerCorsJsonTest extends AbstractIntegrationTest {
 
     private static RequestSpecification specification;
 
@@ -40,20 +42,41 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(1)
-    public void testCreate() throws JsonProcessingException {
-        mockEmployee();
+    @Order(0)
+    public void authorization() {
+        AccountCredentialsDto user = new AccountCredentialsDto("hugo", "admin123");
+
+        var accessToken = given()
+                .basePath("/auth/signin")
+                .port(TestConfigs.SERVER_PORT)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .body(user)
+                .when()
+                .post()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(TokenDto.class)
+                .getAccessToken();
 
         specification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
+                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + accessToken)
                 .setBasePath("/api/employee/v1")
                 .setPort(TestConfigs.SERVER_PORT)
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL))
                 .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
                 .build();
+    }
+
+    @Test
+    @Order(1)
+    public void testCreate() throws JsonProcessingException {
+        mockEmployee();
 
         var content = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
                 .body(employee)
                 .when()
                 .post()
@@ -85,16 +108,9 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
     public void testCreateWithWrongOrigin() {
         mockEmployee();
 
-        specification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_SEMERU)
-                .setBasePath("/api/employee/v1")
-                .setPort(TestConfigs.SERVER_PORT)
-                .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-                .build();
-
         var content = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_SEMERU)
                 .body(employee)
                 .when()
                 .post()
@@ -113,16 +129,9 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
     public void testFindById() throws JsonProcessingException {
         mockEmployee();
 
-        specification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
-                .setBasePath("/api/employee/v1")
-                .setPort(TestConfigs.SERVER_PORT)
-                .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-                .build();
-
         var content = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_ERUDIO)
                 .pathParam("id", employee.getEmployeeId())
                 .when()
                 .get("{id}")
@@ -154,16 +163,9 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
     public void testFindByIdWithWrongOrigin() {
         mockEmployee();
 
-        specification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_SEMERU)
-                .setBasePath("/api/employee/v1")
-                .setPort(TestConfigs.SERVER_PORT)
-                .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-                .build();
-
         var content = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_SEMERU)
                 .pathParam("id", employee.getEmployeeId())
                 .when()
                 .get("{id}")

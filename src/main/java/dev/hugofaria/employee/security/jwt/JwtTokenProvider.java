@@ -29,6 +29,7 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.expire-length:3600000}")
     private long validityInMilliseconds = 3600000; // 1h
 
+    //instancia usada para carregar detalhes do usuario durante a autenticacao.
     private final UserDetailsService userDetailsService;
 
     Algorithm algorithm = null;
@@ -37,12 +38,15 @@ public class JwtTokenProvider {
         this.userDetailsService = userDetailsService;
     }
 
+
+    //@PostConstruct para inicializar a chave secreta e o algoritmo assim que a classe é construída.
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
         algorithm = Algorithm.HMAC256(secretKey.getBytes());
     }
 
+    //gera um token de acesso com base no nome de usuário e nas funcoes atribuídas a esse usuário.
     public TokenDto createAccessToken(String username, List<String> roles) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
@@ -52,6 +56,7 @@ public class JwtTokenProvider {
         return new TokenDto(username, true, now, validity, accessToken, refreshToken);
     }
 
+    //atualiza um token, útil para renovar o token de acesso sem a necessidade de fazer login novamente.
     public TokenDto refreshToken(String refreshToken) {
         if (refreshToken.contains("Bearer ")) refreshToken =
                 refreshToken.substring("Bearer ".length());
@@ -87,6 +92,7 @@ public class JwtTokenProvider {
                 .strip();
     }
 
+    //converte um token em uma instância de Authentication para ser usado pelo Spring Security.
     public Authentication getAuthentication(String token) {
         DecodedJWT decodedJWT = decodedToken(token);
         UserDetails userDetails = this.userDetailsService
@@ -100,6 +106,7 @@ public class JwtTokenProvider {
         return verifier.verify(token);
     }
 
+    //extrai o token do cabeçalho de autorização de uma solicitação HTTP.
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
 
@@ -110,6 +117,7 @@ public class JwtTokenProvider {
         return null;
     }
 
+    //valida se um token é válido ou expirou.
     public boolean validateToken(String token) {
         DecodedJWT decodedJWT = decodedToken(token);
         try {
