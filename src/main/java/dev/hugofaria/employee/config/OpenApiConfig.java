@@ -13,14 +13,14 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("RESTful API with Java 17 and Spring Boot 3")
+                        .title("RESTful Employee Management API")
                         .version("v1")
-                        .description("Some description about your API")
-                        .termsOfService("https://pub.erudio.com.br/meus-cursos")
+                        .description("Explore our RESTful Employee Management API for streamlined employee data management. Navigate seamlessly with Swagger documentation for smooth integration and development.")
+                        .termsOfService("https://github.com/dreackdown")
                         .license(
                                 new License()
                                         .name("Apache 2.0")
-                                        .url("https://pub.erudio.com.br/meus-cursos")
+                                        .url("https://github.com/dreackdown")
                         )
                 );
     }
