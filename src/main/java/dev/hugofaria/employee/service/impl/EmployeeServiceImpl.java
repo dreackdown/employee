@@ -1,7 +1,5 @@
 package dev.hugofaria.employee.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.hugofaria.employee.controller.EmployeeController;
 import dev.hugofaria.employee.dto.v1.EmployeeDto;
 import dev.hugofaria.employee.entity.Employee;
@@ -10,11 +8,14 @@ import dev.hugofaria.employee.exception.ResourceNotFoundException;
 import dev.hugofaria.employee.mapper.DozerMapper;
 import dev.hugofaria.employee.repository.EmployeeRepository;
 import dev.hugofaria.employee.service.EmployeeService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
@@ -25,12 +26,16 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-    final EmployeeRepository employeeRepository;
+    final EmployeeRepository repository;
+
+    final
+    PagedResourcesAssembler<EmployeeDto> assembler;
 
     private final Logger logger = Logger.getLogger(EmployeeServiceImpl.class.getName());
 
-    public EmployeeServiceImpl(EmployeeRepository repository) {
-        this.employeeRepository = repository;
+    public EmployeeServiceImpl(EmployeeRepository repository, PagedResourcesAssembler<EmployeeDto> assembler) {
+        this.repository = repository;
+        this.assembler = assembler;
     }
 
     @Override
@@ -71,18 +76,51 @@ public class EmployeeServiceImpl implements EmployeeService {
         return Collections.emptyList();
     }
 
-    public List<EmployeeDto> findAllEmployees() {
+    public PagedModel<EntityModel<EmployeeDto>> findAllEmployees(Pageable pageable) {
         logger.info("finding all employee...");
 
-        var employees = DozerMapper.parseListObjects(employeeRepository.findAll(), EmployeeDto.class);
-        employees.forEach(p -> p.add(linkTo(methodOn(EmployeeController.class).findEmployeeById(p.getEmployeeId())).withSelfRel()));
-        return employees;
+        var employeePage = repository.findAll(pageable);
+
+        var employeeDtoPage = employeePage.map(p -> DozerMapper.parseObject(p, EmployeeDto.class));
+        employeeDtoPage.map(
+                p -> p.add(
+                        linkTo(methodOn(EmployeeController.class)
+                                .findEmployeeById(p.getEmployeeId())).withSelfRel()));
+
+        Link link = linkTo(
+                methodOn(EmployeeController.class)
+                        .findAllEmployees(pageable.getPageNumber(),
+                                pageable.getPageSize(),
+                                "asc")).withSelfRel();
+
+        return assembler.toModel(employeeDtoPage, link);
+    }
+
+    public PagedModel<EntityModel<EmployeeDto>> findEmployeeByName(String firstname, Pageable pageable) {
+
+        logger.info("finding all employee...");
+
+        var employeePage = repository.findEmployeeByName(firstname, pageable);
+
+        var employeeDtoPage = employeePage.map(p -> DozerMapper.parseObject(p, EmployeeDto.class));
+        employeeDtoPage.map(
+                p -> p.add(
+                        linkTo(methodOn(EmployeeController.class)
+                                .findEmployeeById(p.getEmployeeId())).withSelfRel()));
+
+        Link link = linkTo(
+                methodOn(EmployeeController.class)
+                        .findAllEmployees(pageable.getPageNumber(),
+                                pageable.getPageSize(),
+                                "asc")).withSelfRel();
+
+        return assembler.toModel(employeeDtoPage, link);
     }
 
     public EmployeeDto findEmployeeById(Long id) {
-        logger.info("finding one employee...!");
+        logger.info("finding one employee...");
 
-        var entity = employeeRepository.findById(id)
+        var entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
         var dto = DozerMapper.parseObject(entity, EmployeeDto.class);
         dto.add(linkTo(methodOn(EmployeeController.class).findEmployeeById(id)).withSelfRel());
@@ -94,7 +132,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         logger.info("creating employee...");
 
         var entity = DozerMapper.parseObject(employee, Employee.class);
-        var dto = DozerMapper.parseObject(employeeRepository.save(entity), EmployeeDto.class);
+        var dto = DozerMapper.parseObject(repository.save(entity), EmployeeDto.class);
         dto.add(linkTo(methodOn(EmployeeController.class).findEmployeeById(dto.getEmployeeId())).withSelfRel());
         return dto;
     }
@@ -103,22 +141,36 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employee == null) throw new RequiredObjectIsNullException();
         logger.info("updating employee...");
 
-        var entity = employeeRepository.findById(employee.getEmployeeId())
+        var entity = repository.findById(employee.getEmployeeId())
                 .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
 
         entity.setFirstName(employee.getFirstName());
         entity.setLastName(employee.getLastName());
         entity.setRole(employee.getRole());
 
-        var updatedEmployee = DozerMapper.parseObject(employeeRepository.save(entity), EmployeeDto.class);
+        var updatedEmployee = DozerMapper.parseObject(repository.save(entity), EmployeeDto.class);
         updatedEmployee.add(linkTo(methodOn(EmployeeController.class).findEmployeeById(updatedEmployee.getEmployeeId())).withSelfRel());
         return updatedEmployee;
     }
 
+    @Transactional
+    public EmployeeDto disableEmployee(Long id) {
+
+        logger.info("disabling one employee...");
+
+        repository.disableEmployee(id);
+
+        var entity = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
+        var dto = DozerMapper.parseObject(entity, EmployeeDto.class);
+        dto.add(linkTo(methodOn(EmployeeController.class).findEmployeeById(id)).withSelfRel());
+        return dto;
+    }
+
     public void deleteEmployee(Long id) {
         logger.info("deleting employee...");
-        var entity = employeeRepository.findById(id)
+        var entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
-        employeeRepository.delete(entity);
+        repository.delete(entity);
     }
 }

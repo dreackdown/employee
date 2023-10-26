@@ -96,6 +96,7 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
         assertNotNull(persistedEmployee.getFirstName());
         assertNotNull(persistedEmployee.getLastName());
         assertNotNull(persistedEmployee.getRole());
+        assertTrue(persistedEmployee.getEnabled());
 
         assertTrue(persistedEmployee.getEmployeeId() > 0);
 
@@ -129,6 +130,7 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
         assertNotNull(persistedEmployee.getFirstName());
         assertNotNull(persistedEmployee.getLastName());
         assertNotNull(persistedEmployee.getRole());
+        assertTrue(persistedEmployee.getEnabled());
 
         assertEquals(employee.getEmployeeId(), persistedEmployee.getEmployeeId());
 
@@ -139,6 +141,39 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
 
     @Test
     @Order(3)
+    public void testDisableEmployeeById() throws JsonProcessingException {
+
+        var content = given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .pathParam("id", employee.getEmployeeId())
+                .when()
+                .patch("{id}")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        EmployeeDTO persistedEmployee = objectMapper.readValue(content, EmployeeDTO.class);
+        employee = persistedEmployee;
+
+        assertNotNull(persistedEmployee);
+
+        assertNotNull(persistedEmployee.getEmployeeId());
+        assertNotNull(persistedEmployee.getFirstName());
+        assertNotNull(persistedEmployee.getLastName());
+        assertNotNull(persistedEmployee.getRole());
+        assertFalse(persistedEmployee.getEnabled());
+
+        assertEquals(employee.getEmployeeId(), persistedEmployee.getEmployeeId());
+
+        assertEquals("Nelson", persistedEmployee.getFirstName());
+        assertEquals("Piquet Souto Maior", persistedEmployee.getLastName());
+        assertEquals("Developer", persistedEmployee.getRole());
+    }
+
+    @Test
+    @Order(4)
     public void testFindById() throws JsonProcessingException {
         mockEmployee();
 
@@ -153,25 +188,26 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
                 .body()
                 .asString();
 
-        EmployeeDTO persistedPerson = objectMapper.readValue(content, EmployeeDTO.class);
-        employee = persistedPerson;
+        EmployeeDTO persistedEmployee = objectMapper.readValue(content, EmployeeDTO.class);
+        employee = persistedEmployee;
 
-        assertNotNull(persistedPerson);
+        assertNotNull(persistedEmployee);
 
-        assertNotNull(persistedPerson.getEmployeeId());
-        assertNotNull(persistedPerson.getFirstName());
-        assertNotNull(persistedPerson.getLastName());
-        assertNotNull(persistedPerson.getRole());
+        assertNotNull(persistedEmployee.getEmployeeId());
+        assertNotNull(persistedEmployee.getFirstName());
+        assertNotNull(persistedEmployee.getLastName());
+        assertNotNull(persistedEmployee.getRole());
+        assertFalse(persistedEmployee.getEnabled());
 
-        assertEquals(employee.getEmployeeId(), persistedPerson.getEmployeeId());
+        assertEquals(employee.getEmployeeId(), persistedEmployee.getEmployeeId());
 
-        assertEquals("Nelson", persistedPerson.getFirstName());
-        assertEquals("Piquet Souto Maior", persistedPerson.getLastName());
-        assertEquals("Developer", persistedPerson.getRole());
+        assertEquals("Nelson", persistedEmployee.getFirstName());
+        assertEquals("Piquet Souto Maior", persistedEmployee.getLastName());
+        assertEquals("Developer", persistedEmployee.getRole());
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     public void testDelete() {
 
         given().spec(specification)
@@ -184,7 +220,7 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     public void testFindAll() throws JsonProcessingException {
 
         var content = given().spec(specification)
@@ -229,7 +265,7 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
 
 
     @Test
-    @Order(6)
+    @Order(7)
     public void testFindAllWithoutToken() {
 
         RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
@@ -251,5 +287,6 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
         employee.setFirstName("Nelson");
         employee.setLastName("Piquet");
         employee.setRole("Developer");
+        employee.setEnabled(true);
     }
 }
