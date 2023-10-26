@@ -34,4 +34,6 @@ public class Employee implements Serializable {
     @Column(name = "role", nullable = false)
     private String role;
 
+    @Column(nullable = false)
+    private Boolean enabled;
 }

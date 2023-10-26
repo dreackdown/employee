@@ -1,6 +1,5 @@
 package dev.hugofaria.employee.dto.v1;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +20,7 @@ public class EmployeeDto extends RepresentationModel<EmployeeDto> implements Ser
     private String firstName;
     private String lastName;
     private String role;
+    private Boolean enabled;
 //
 //    public EmployeeDto(@JsonProperty("first") String firstName, @JsonProperty("last") String lastName) {
 //        this.firstName = firstName;
