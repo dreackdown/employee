@@ -1,7 +1,7 @@
 package dev.hugofaria.employee.controller;
 
 import dev.hugofaria.employee.dto.v1.EmployeeDto;
-import dev.hugofaria.employee.service.impl.EmployeeServiceImpl;
+import dev.hugofaria.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,9 +26,9 @@ import java.util.List;
 @Tag(name = "Employees", description = "Endpoints for Managing Employees")
 public class EmployeeController {
 
-    private final EmployeeServiceImpl service;
+    private final EmployeeService service;
 
-    public EmployeeController(EmployeeServiceImpl service) {
+    public EmployeeController(EmployeeService service) {
         this.service = service;
     }
 

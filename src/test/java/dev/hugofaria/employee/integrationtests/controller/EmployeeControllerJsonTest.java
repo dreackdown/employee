@@ -1,13 +1,13 @@
 package dev.hugofaria.employee.integrationtests.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.hugofaria.employee.config.TestConfigs;
 import dev.hugofaria.employee.integrationtests.dto.AccountCredentialsDto;
 import dev.hugofaria.employee.integrationtests.dto.EmployeeDTO;
 import dev.hugofaria.employee.integrationtests.dto.TokenDto;
+import dev.hugofaria.employee.integrationtests.dto.wrappers.WrapperEmployeeDto;
 import dev.hugofaria.employee.integrationtests.testcontainers.AbstractIntegrationTest;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -21,8 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
-
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,7 +29,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
 
     private static RequestSpecification specification;
+
     private static ObjectMapper objectMapper;
+
     private static EmployeeDTO employee;
 
     @BeforeAll
@@ -225,6 +225,8 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
 
         var content = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .accept(TestConfigs.CONTENT_TYPE_JSON)
+                .queryParams("page", 3, "size", 10, "direction", "asc")
                 .when()
                 .get()
                 .then()
@@ -233,8 +235,8 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
                 .body()
                 .asString();
 
-        List<EmployeeDTO> employees = objectMapper.readValue(content, new TypeReference<>() {
-        });
+        WrapperEmployeeDto wrapper = objectMapper.readValue(content, WrapperEmployeeDto.class);
+        var employees = wrapper.getEmbedded().getEmployees();
 
         EmployeeDTO foundEmployeeOne = employees.get(0);
 
@@ -243,11 +245,11 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
         assertNotNull(foundEmployeeOne.getLastName());
         assertNotNull(foundEmployeeOne.getRole());
 
-        assertEquals(1, foundEmployeeOne.getEmployeeId());
+        assertEquals(282, foundEmployeeOne.getEmployeeId());
 
-        assertEquals("Milja", foundEmployeeOne.getFirstName());
-        assertEquals("Ollila", foundEmployeeOne.getLastName());
-        assertEquals("Mystic", foundEmployeeOne.getRole());
+        assertEquals("Allina", foundEmployeeOne.getFirstName());
+        assertEquals("Fonteyne", foundEmployeeOne.getLastName());
+        assertEquals("Construction Worker", foundEmployeeOne.getRole());
 
         EmployeeDTO foundEmployeeSix = employees.get(5);
 
@@ -256,16 +258,51 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
         assertNotNull(foundEmployeeSix.getLastName());
         assertNotNull(foundEmployeeSix.getRole());
 
-        assertEquals(9, foundEmployeeSix.getEmployeeId());
+        assertEquals(420, foundEmployeeSix.getEmployeeId());
 
-        assertEquals("Slaviša", foundEmployeeSix.getFirstName());
-        assertEquals("Heiko", foundEmployeeSix.getLastName());
-        assertEquals("Archivist", foundEmployeeSix.getRole());
+        assertEquals("Amara", foundEmployeeSix.getFirstName());
+        assertEquals("Bruckent", foundEmployeeSix.getLastName());
+        assertEquals("Construction Foreman", foundEmployeeSix.getRole());
     }
-
 
     @Test
     @Order(7)
+    public void testFindByName() throws JsonProcessingException {
+
+        var content = given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .accept(TestConfigs.CONTENT_TYPE_JSON)
+                .pathParam("firstName", "cal")
+                .queryParams("page", 0, "size", 6, "direction", "asc")
+                .when()
+                .get("findPersonByName/{firstName}")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        WrapperEmployeeDto wrapper = objectMapper.readValue(content, WrapperEmployeeDto.class);
+        var people = wrapper.getEmbedded().getEmployees();
+
+        EmployeeDTO foundPersonOne = people.get(0);
+
+        assertNotNull(foundPersonOne.getEmployeeId());
+        assertNotNull(foundPersonOne.getFirstName());
+        assertNotNull(foundPersonOne.getLastName());
+        assertNotNull(foundPersonOne.getRole());
+
+        assertTrue(foundPersonOne.getEnabled());
+
+        assertEquals(22, foundPersonOne.getEmployeeId());
+
+        assertEquals("Caleb", foundPersonOne.getFirstName());
+        assertEquals("Holdworth", foundPersonOne.getLastName());
+        assertEquals("Electrician", foundPersonOne.getRole());
+    }
+
+    @Test
+    @Order(8)
     public void testFindAllWithoutToken() {
 
         RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
@@ -281,6 +318,35 @@ public class EmployeeControllerJsonTest extends AbstractIntegrationTest {
                 .get()
                 .then()
                 .statusCode(403);
+    }
+
+    @Test
+    @Order(9)
+    public void testHATEOAS() {
+
+        var content = given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .accept(TestConfigs.CONTENT_TYPE_JSON)
+                .queryParams("page", 3, "size", 10, "direction", "asc")
+                .when()
+                .get()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/employee/v1/227\"}}}"));
+        assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/employee/v1/282\"}}}"));
+        assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/employee/v1/198\"}}}"));
+
+        assertTrue(content.contains("{\"first\":{\"href\":\"http://localhost:8888/api/employee/v1?direction=asc&page=0&size=10&sort=firstName,asc\"}"));
+        assertTrue(content.contains("\"prev\":{\"href\":\"http://localhost:8888/api/employee/v1?direction=asc&page=2&size=10&sort=firstName,asc\"}"));
+        assertTrue(content.contains("\"self\":{\"href\":\"http://localhost:8888/api/employee/v1?page=3&size=10&direction=asc\"}"));
+        assertTrue(content.contains("\"next\":{\"href\":\"http://localhost:8888/api/employee/v1?direction=asc&page=4&size=10&sort=firstName,asc\"}"));
+        assertTrue(content.contains("\"last\":{\"href\":\"http://localhost:8888/api/employee/v1?direction=asc&page=100&size=10&sort=firstName,asc\"}}"));
+
+        assertTrue(content.contains("\"page\":{\"size\":10,\"totalElements\":1007,\"totalPages\":101,\"number\":3}}"));
     }
 
     private void mockEmployee() {

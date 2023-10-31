@@ -1,7 +1,7 @@
 package dev.hugofaria.employee.controller;
 
 import dev.hugofaria.employee.dto.v1.security.AccountCredentialsDto;
-import dev.hugofaria.employee.service.impl.AuthServiceImpl;
+import dev.hugofaria.employee.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
 
-    final AuthServiceImpl authService;
+    final AuthService authService;
 
-    public AuthController(AuthServiceImpl authService) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
     }
 

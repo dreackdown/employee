@@ -180,9 +180,23 @@ public class EmployeeControllerCorsJsonTest extends AbstractIntegrationTest {
         assertEquals("Invalid CORS request", content);
     }
 
+    @Test
+    @Order(5)
+    public void testDelete() {
+
+        given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .pathParam("id", employee.getEmployeeId())
+                .when()
+                .delete("{id}")
+                .then()
+                .statusCode(204);
+    }
+
     private void mockEmployee() {
         employee.setFirstName("Richard");
         employee.setLastName("Stallman");
         employee.setRole("Manager");
+        employee.setEnabled(true);
     }
 }
