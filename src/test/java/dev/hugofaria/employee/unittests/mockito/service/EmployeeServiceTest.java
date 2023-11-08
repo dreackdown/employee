@@ -1,4 +1,4 @@
-package dev.hugofaria.employee.unittests.mockito.impl;
+package dev.hugofaria.employee.unittests.mockito.service;
 
 import dev.hugofaria.employee.dto.v1.EmployeeDto;
 import dev.hugofaria.employee.entity.Employee;

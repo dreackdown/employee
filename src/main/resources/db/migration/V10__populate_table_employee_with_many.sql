@@ -786,7 +786,7 @@ INSERT INTO `employee` (`first_name`, `last_name`, `role`, `enabled`) VALUES
 ('Nicko', 'Gilli', 'Construction Foreman', b'0'),
 ('Desi', 'Abrashkin', 'Subcontractor', b'1'),
 ('Cesar', 'Krzyzanowski', 'Surveyor', b'0'),
-('Papagena', 'Dun', 'Estimator', b'0'),
+('Papagena', 'Dun', 'Estimator', b'1'),
 ('Zaccaria', 'Harflete', 'Surveyor', b'1'),
 ('Gertrude', 'Suttling', 'Architect', b'1'),
 ('Adena', 'Deluce', 'Project Manager', b'0'),
