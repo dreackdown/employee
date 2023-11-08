@@ -25,11 +25,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Service
 public class EmployeeService {
 
+    private final Logger logger = Logger.getLogger(EmployeeService.class.getName());
+
     final EmployeeRepository repository;
 
     final PagedResourcesAssembler<EmployeeDto> assembler;
-
-    private final Logger logger = Logger.getLogger(EmployeeService.class.getName());
 
     public EmployeeService(EmployeeRepository repository, PagedResourcesAssembler<EmployeeDto> assembler) {
         this.repository = repository;
